@@ -3,11 +3,10 @@
 dir=$(dirname $0)
 
 ## url
-
 link=$1
 linkExistFlg="TRUE"
 
-## default
+## default url link
 [ "$link" == "" ] && {
   link=$(
     echo "http://actress.dmm.co.jp/-/detail/=/actress_id=11239/"
@@ -18,7 +17,7 @@ linkExistFlg="TRUE"
 ## link check
 echo $link
 
-## actrell_id
+## actres_id
 actress_id=$(
   echo $link | 
   awk -F"/" '{print $7}' | 
@@ -95,7 +94,7 @@ special=$(
   awk -F"[<>]" '{print $3}'
 )
 
-echo $birthday,$star,$blood,$style,$birthPlace,$special >> av_actress_profile.dat
+echo $actress_id,$actress_name,$actress_name_yomi,$birthday,$star,$blood,$style,$birthPlace,$special >> av_actress_profile.dat
 
 cat av_actress_profile.dat
 
