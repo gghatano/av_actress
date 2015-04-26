@@ -7,7 +7,7 @@ dir=$(dirname $0)
   rm $dir/av_actress_profile.dat
 }
 
-cat $dir/profile_link.dat | head -n 2 |  
+cat $dir/profile_link.dat | 
 while read line 
 do
   $dir/actress_scrape.bash $line
