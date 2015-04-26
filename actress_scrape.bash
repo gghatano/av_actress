@@ -2,7 +2,7 @@
 
 dir=$(dirname $0)
 
-## argment : url
+## url
 
 link=$1
 linkExistFlg="TRUE"
