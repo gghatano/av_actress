@@ -1,0 +1,147 @@
+秋田美人のAV女優が多い...って本当ですか?
+====
+
+## はじめに
+
+[おぎやはぎのメガネびいきPodCast](https://itunes.apple.com/jp/podcast/junk-ogiyahaginomeganebiiki/id201596396?mt=2)を聴いていたところ, 
+
+「秋田美人って本当かねー?」
+
+「わかんなけど, タクシーの運ちゃん曰く, 秋田には綺麗なAV女優が多いらしいよ」
+
+という話があったような気がします. 
+
+真偽の程はともかく, AV女優の出身地分布は気になりますよね. 
+
+データを用意することが出来たので, 調べてみました.
+
+### AV女優のプロフィールデータ
+
+[DMM.comのAV女優名鑑](http://actress.dmm.co.jp/-/detail/=/actress_id=11239/)には, 以下の情報が掲載されていました. 
+
+* プロフィール
+  * 生年月日
+  
+  * 星座
+  
+  * 血液型
+  
+  * スリーサイズとカップ数
+  
+  * 出身地
+
+  * 趣味, 特技
+
+出身地が書いてありましたので, これを使えば良さそうです. 
+
+えいやっとクロールして, 整理してcsvデータにしてみました. 
+
+## 準備
+```{r, message=FALSE, warning=FALSE}
+library(data.table)
+library(dplyr)
+
+dat_av = fread("./av_actress_profile.dat")
+dat_av = 
+  dat_av %>% 
+  mutate(birthday = as.Date(birthday, format="%Y年%m月%d日"))
+## データの中身
+dat_av %>% select(name, birthday, birthplace, blood) %>% head(2)
+```
+
+## 出身地別AV女優人数
+
+とりあえず出身地別AV女優人数を見ます.
+```{r}
+library(ggplot2)
+dat_birthplace = dat_av %>% 
+  filter(birthplace != "") %>% 
+  group_by(birthplace) %>% 
+  count(birthplace) %>% 
+  arrange(desc(n))
+
+dat_birthplace
+```
+
+東京と神奈川で殆どです. 
+
+
+## 10万人あたりのAV女優人数ランキング(上位5県)
+
+各都道府県の人口も考えないといけませんよね. 
+
+[政府統計のe-stat](http://www.e-stat.go.jp/SG1/estat/eStatTopPortal.do)から, 国勢調査の結果データが得られました. 
+
+2013年の都道府県別人口データを取得して, 10万人あたりのAV女優人数を見てみます. 
+
+AV女優比率の上位5県を見てみましょう. 
+```{r, results='asis'}
+library(xtable)
+## 県別統計データ(千人)
+dat_pops = fread("./pops.csv", header=FALSE)
+dat_pops %>% setnames(c("birthplace", "birthplace_yomi", "pops"))
+
+dat_birthplace %>% 
+  merge(dat_pops, by = "birthplace") %>% 
+  mutate(av_ratio = n/pops * 100) %>% 
+  select(birthplace, av_ratio) %>% 
+  arrange(desc(av_ratio)) %>% 
+  head(5) %>% 
+  xtable() %>% print(type="html")
+```
+
+10万人あたりAV女優人数でランキングにしてみました. 
+
+1位は東京. さすがです. 10万人あたり9.18人. 
+
+意外と秋田が多いですね. 10万人あたりで2.86人で, 3位です. 
+
+秋田美人AV女優多い説, 結構正しかったです. 
+
+## 10万人あたりのAV女優人数ランキング(下位5県)
+ついでに, AV女優比率が低い5県も見てみます. 
+
+```{r, results='asis'}
+dat_birthplace %>% 
+  merge(dat_pops, by = "birthplace") %>% 
+  mutate(av_ratio = n/pops * 100) %>% 
+  select(birthplace, av_ratio) %>% 
+  arrange(desc(av_ratio)) %>% 
+  tail(5) %>% 
+  xtable() %>% print(type="html")
+
+```
+
+佐賀www
+
+
+## まとめと展望
+
+
+AV女優のプロフィールデータから, 都道府県別AV女優人数を調べました. 
+
+10万人あたりのAV女優数で比較すると, 東京, 神奈川, 秋田がTop3でした. 
+
+以上です. 
+
+最後に, 今後やりたいことと, 全都道府県ランキングを載せます. 
+
+他に何が出来ますかね?
+
+* やりたいこと
+  * 日本地図上に可視化してみる
+  * カップ数も考えて集計
+  * スリースタイルのデータで遊ぶ
+  * 出演作品数も調べてみる
+  * 出演作品のタグも拾ってみて, ジャンルも見る(ロリとか巨乳とか)
+
+## 10万人あたりのAV女優人数(47都道府県)
+```{r, results='asis'}
+dat_birthplace %>% 
+  merge(dat_pops, by = "birthplace") %>% 
+  mutate(av_ratio = n/pops * 100) %>% 
+  select(birthplace, av_ratio) %>% 
+  arrange(desc(av_ratio)) %>% 
+  xtable() %>% print(type="html")
+
+```
