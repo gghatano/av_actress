@@ -34,7 +34,8 @@ actress_name=$(
   cat /tmp/actress_id_"$actress_id".html | 
   grep "title" | 
   head -n 1 | 
-  awk -F"[<>\(\)]" '{print $3}' 
+  awk -F"[<>\(\)]" '{print $3}' |
+  sed 's/,/、/g' 
 )
 
 
@@ -43,7 +44,8 @@ actress_name_yomi=$(
   cat /tmp/actress_id_"$actress_id".html | 
   grep "title" | 
   head -n 1 | 
-  awk -F"[<>\(\)]" '{print $4}' 
+  awk -F"[<>\(\)]" '{print $4}' |
+  sed 's/,/、/g' 
 )
 
 birthday=$(
@@ -51,7 +53,8 @@ birthday=$(
   grep -A1 '^<td align="right" nowrap>' | 
   grep -A1 "生年月日" | 
   tail -n 1 | 
-  awk -F"[<>]" '{print $3}'
+  awk -F"[<>]" '{print $3}' |
+  sed 's/,/、/g' 
 )
 
 star=$(
@@ -59,7 +62,8 @@ star=$(
   grep -A1 '^<td align="right" nowrap>' | 
   grep -A1 "星座" | 
   tail -n 1 | 
-  awk -F"[<>]" '{print $3}'
+  awk -F"[<>]" '{print $3}' | 
+  sed 's/,/、/g'
 )
 
 blood=$(
@@ -67,7 +71,8 @@ blood=$(
   grep -A1 '^<td align="right" nowrap>' | 
   grep -A1 "血液型" | 
   tail -n 1 | 
-  awk -F"[<>]" '{print $3}'
+  awk -F"[<>]" '{print $3}' | 
+  sed 's/,/、/g'
 )
 
 style=$(
@@ -75,7 +80,8 @@ style=$(
   grep -A1 '^<td align="right" nowrap>' | 
   grep -A1 "サイズ" | 
   tail -n 1 | 
-  awk -F"[<>]" '{print $3}'
+  awk -F"[<>]" '{print $3}' |
+  sed 's/,/、/g'
 )
 
 birthPlace=$(
@@ -83,7 +89,8 @@ birthPlace=$(
   grep -A1 '^<td align="right" nowrap>' | 
   grep -A1 "出身地" | 
   tail -n 1 | 
-  awk -F"[<>]" '{print $3}'
+  awk -F"[<>]" '{print $3}' | 
+  sed 's/,/、/g'
 )
 
 special=$(
@@ -91,7 +98,8 @@ special=$(
   grep -A1 '^<td align="right" nowrap>' | 
   grep -A1 "趣味" | 
   tail -n 1 | 
-  awk -F"[<>]" '{print $3}'
+  awk -F"[<>]" '{print $3}' | 
+  sed 's/,/、/g'
 )
 
 echo $actress_id,$actress_name,$actress_name_yomi,$birthday,$star,$blood,$style,$birthPlace,$special >> av_actress_profile.dat
