@@ -1,4 +1,4 @@
-秋田美人のAV女優が多い...って本当ですか?
+秋田美人のAV女優が多い...って本当?
 ====
 
 ## はじめに
@@ -7,7 +7,7 @@
 
 「秋田美人って本当かねー?」
 
-「わかんなけど, タクシーの運ちゃん曰く, 秋田には綺麗なAV女優が多いらしいよ」
+「わかんないけど, タクシーの運ちゃん曰く, 秋田には綺麗なAV女優が多いらしいよ」
 
 という話があったような気がします. 
 
@@ -56,6 +56,16 @@ dat_av %>% select(name, birthday, birthplace, blood) %>% head(2)
 ## 2: 藍色しあん 1991-10-21   神奈川県     A
 ```
 
+```r
+dat_av %>% dim
+```
+
+```
+## [1] 9049    9
+```
+
+9049人分のAV女優のプロフィールデータです. 
+
 ## 出身地別AV女優人数
 
 とりあえず出身地別AV女優人数を見ます.
@@ -68,6 +78,15 @@ dat_birthplace = dat_av %>%
   count(birthplace) %>% 
   arrange(desc(n))
 
+dat_birthplace %>% 
+  select(n) %>% sum
+```
+
+```
+## [1] 2601
+```
+
+```r
 dat_birthplace
 ```
 
@@ -88,7 +107,7 @@ dat_birthplace
 ## ..        ...  ...
 ```
 
-東京と神奈川で殆どです. 
+2601人分の出身地データが有りましたが, 東京と神奈川で半分です. 
 
 
 ## 10万人あたりのAV女優人数ランキング(上位5県)
@@ -117,7 +136,7 @@ dat_birthplace %>%
 ```
 
 <!-- html table generated in R 3.1.3 by xtable 1.7-4 package -->
-<!-- Sun Apr 26 15:12:42 2015 -->
+<!-- Tue Apr 28 06:03:32 2015 -->
 <table border=1>
 <tr> <th>  </th> <th> birthplace </th> <th> av_ratio </th>  </tr>
   <tr> <td align="right"> 1 </td> <td> 東京都 </td> <td align="right"> 9.18 </td> </tr>
@@ -150,7 +169,7 @@ dat_birthplace %>%
 ```
 
 <!-- html table generated in R 3.1.3 by xtable 1.7-4 package -->
-<!-- Sun Apr 26 15:12:42 2015 -->
+<!-- Tue Apr 28 06:03:32 2015 -->
 <table border=1>
 <tr> <th>  </th> <th> birthplace </th> <th> av_ratio </th>  </tr>
   <tr> <td align="right"> 1 </td> <td> 岐阜県 </td> <td align="right"> 0.20 </td> </tr>
@@ -172,7 +191,7 @@ AV女優のプロフィールデータから, 都道府県別AV女優人数を�
 
 以上です. 
 
-最後に, 今後やりたいことと, 全都道府県ランキングを載せます. 
+最後に, 今後やりたいことを載せます. 
 
 他に何が出来ますかね?
 
@@ -183,66 +202,48 @@ AV女優のプロフィールデータから, 都道府県別AV女優人数を�
   * 出演作品数も調べてみる
   * 出演作品のタグも拾ってみて, ジャンルも見る(ロリとか巨乳とか)
 
-## 10万人あたりのAV女優人数(47都道府県)
+
+
+## 日本地図上で可視化(Choroplethrを使う)
+
+大変ありがたいご指摘を頂きました. 
+
+[Choroplethrを使って可視化すれば](http://rpubs.com/dichika/are_150426)いいみたいです. 
+
 
 ```r
-dat_birthplace %>% 
+library(choroplethr)
+library(choroplethrAdmin1)
+
+dat_av_ratio = 
+  dat_birthplace %>% 
   merge(dat_pops, by = "birthplace") %>% 
   mutate(av_ratio = n/pops * 100) %>% 
-  select(birthplace, av_ratio) %>% 
-  arrange(desc(av_ratio)) %>% 
-  xtable() %>% print(type="html")
+  arrange(desc(av_ratio)) %>%
+  mutate(region = tolower(birthplace_yomi)) %>% 
+  mutate(value = av_ratio) %>% 
+  select(region, value)
+
+data("df_japan_census")
+
+df_japan_census = 
+  df_japan_census %>% 
+  merge(dat_av_ratio, by = "region")
+
+## 可視化
+admin1_choropleth(country.name = "japan",
+                  df = df_japan_census, 
+                  title = "AV actress ratio", 
+                  legend = "number")
 ```
 
-<!-- html table generated in R 3.1.3 by xtable 1.7-4 package -->
-<!-- Sun Apr 26 15:12:42 2015 -->
-<table border=1>
-<tr> <th>  </th> <th> birthplace </th> <th> av_ratio </th>  </tr>
-  <tr> <td align="right"> 1 </td> <td> 東京都 </td> <td align="right"> 9.18 </td> </tr>
-  <tr> <td align="right"> 2 </td> <td> 神奈川県 </td> <td align="right"> 4.15 </td> </tr>
-  <tr> <td align="right"> 3 </td> <td> 秋田県 </td> <td align="right"> 2.86 </td> </tr>
-  <tr> <td align="right"> 4 </td> <td> 北海道 </td> <td align="right"> 1.93 </td> </tr>
-  <tr> <td align="right"> 5 </td> <td> 京都府 </td> <td align="right"> 1.68 </td> </tr>
-  <tr> <td align="right"> 6 </td> <td> 千葉県 </td> <td align="right"> 1.68 </td> </tr>
-  <tr> <td align="right"> 7 </td> <td> 宮城県 </td> <td align="right"> 1.42 </td> </tr>
-  <tr> <td align="right"> 8 </td> <td> 山梨県 </td> <td align="right"> 1.42 </td> </tr>
-  <tr> <td align="right"> 9 </td> <td> 埼玉県 </td> <td align="right"> 1.34 </td> </tr>
-  <tr> <td align="right"> 10 </td> <td> 新潟県 </td> <td align="right"> 1.33 </td> </tr>
-  <tr> <td align="right"> 11 </td> <td> 静岡県 </td> <td align="right"> 1.29 </td> </tr>
-  <tr> <td align="right"> 12 </td> <td> 山形県 </td> <td align="right"> 1.23 </td> </tr>
-  <tr> <td align="right"> 13 </td> <td> 長野県 </td> <td align="right"> 1.23 </td> </tr>
-  <tr> <td align="right"> 14 </td> <td> 岩手県 </td> <td align="right"> 1.08 </td> </tr>
-  <tr> <td align="right"> 15 </td> <td> 青森県 </td> <td align="right"> 1.05 </td> </tr>
-  <tr> <td align="right"> 16 </td> <td> 山口県 </td> <td align="right"> 0.85 </td> </tr>
-  <tr> <td align="right"> 17 </td> <td> 沖縄県 </td> <td align="right"> 0.78 </td> </tr>
-  <tr> <td align="right"> 18 </td> <td> 岡山県 </td> <td align="right"> 0.73 </td> </tr>
-  <tr> <td align="right"> 19 </td> <td> 福島県 </td> <td align="right"> 0.72 </td> </tr>
-  <tr> <td align="right"> 20 </td> <td> 福岡県 </td> <td align="right"> 0.71 </td> </tr>
-  <tr> <td align="right"> 21 </td> <td> 石川県 </td> <td align="right"> 0.69 </td> </tr>
-  <tr> <td align="right"> 22 </td> <td> 兵庫県 </td> <td align="right"> 0.67 </td> </tr>
-  <tr> <td align="right"> 23 </td> <td> 茨城県 </td> <td align="right"> 0.65 </td> </tr>
-  <tr> <td align="right"> 24 </td> <td> 大阪府 </td> <td align="right"> 0.63 </td> </tr>
-  <tr> <td align="right"> 25 </td> <td> 福井県 </td> <td align="right"> 0.63 </td> </tr>
-  <tr> <td align="right"> 26 </td> <td> 宮崎県 </td> <td align="right"> 0.62 </td> </tr>
-  <tr> <td align="right"> 27 </td> <td> 群馬県 </td> <td align="right"> 0.60 </td> </tr>
-  <tr> <td align="right"> 28 </td> <td> 栃木県 </td> <td align="right"> 0.60 </td> </tr>
-  <tr> <td align="right"> 29 </td> <td> 滋賀県 </td> <td align="right"> 0.56 </td> </tr>
-  <tr> <td align="right"> 30 </td> <td> 高知県 </td> <td align="right"> 0.54 </td> </tr>
-  <tr> <td align="right"> 31 </td> <td> 広島県 </td> <td align="right"> 0.53 </td> </tr>
-  <tr> <td align="right"> 32 </td> <td> 愛知県 </td> <td align="right"> 0.48 </td> </tr>
-  <tr> <td align="right"> 33 </td> <td> 鹿児島県 </td> <td align="right"> 0.48 </td> </tr>
-  <tr> <td align="right"> 34 </td> <td> 香川県 </td> <td align="right"> 0.41 </td> </tr>
-  <tr> <td align="right"> 35 </td> <td> 富山県 </td> <td align="right"> 0.37 </td> </tr>
-  <tr> <td align="right"> 36 </td> <td> 奈良県 </td> <td align="right"> 0.36 </td> </tr>
-  <tr> <td align="right"> 37 </td> <td> 愛媛県 </td> <td align="right"> 0.36 </td> </tr>
-  <tr> <td align="right"> 38 </td> <td> 鳥取県 </td> <td align="right"> 0.35 </td> </tr>
-  <tr> <td align="right"> 39 </td> <td> 三重県 </td> <td align="right"> 0.33 </td> </tr>
-  <tr> <td align="right"> 40 </td> <td> 和歌山県 </td> <td align="right"> 0.31 </td> </tr>
-  <tr> <td align="right"> 41 </td> <td> 島根県 </td> <td align="right"> 0.28 </td> </tr>
-  <tr> <td align="right"> 42 </td> <td> 長崎県 </td> <td align="right"> 0.21 </td> </tr>
-  <tr> <td align="right"> 43 </td> <td> 岐阜県 </td> <td align="right"> 0.20 </td> </tr>
-  <tr> <td align="right"> 44 </td> <td> 大分県 </td> <td align="right"> 0.17 </td> </tr>
-  <tr> <td align="right"> 45 </td> <td> 熊本県 </td> <td align="right"> 0.17 </td> </tr>
-  <tr> <td align="right"> 46 </td> <td> 徳島県 </td> <td align="right"> 0.13 </td> </tr>
-  <tr> <td align="right"> 47 </td> <td> 佐賀県 </td> <td align="right"> 0.12 </td> </tr>
-   </table>
+```
+## Warning in self$bind(): The following regions were missing and are being
+## set to NA: NA
+```
+
+![plot of chunk unnamed-chunk-5](figure/unnamed-chunk-5-1.png) 
+
+これはかっこいいですね! 
+
+
